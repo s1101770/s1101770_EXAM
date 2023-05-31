@@ -1,23 +1,34 @@
 package com.example.myapplication
 
 import android.os.Bundle
+import android.service.autofill.OnClickAction
+import android.util.Log
+import android.view.MotionEvent
+import android.view.View.OnClickListener
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,8 +50,18 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Greeting(name: String) {
+
+    val context = LocalContext.current
+    val lastX = remember {
+        mutableSetOf(790f)
+    }
+    val lastY = remember {
+        mutableSetOf(200f)
+    }
+
     Column(modifier = Modifier
         .fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -52,11 +73,25 @@ fun Greeting(name: String) {
     Box(modifier = Modifier.fillMaxSize()){
         Canvas(
             modifier = Modifier
+                .fillMaxSize()
+                .pointerInteropFilter { motionEvent ->
+                    when(motionEvent.action){
+                        MotionEvent.ACTION_DOWN -> {
+                            Log.d("now", motionEvent.y.toString())
+                            if ( 820f >= motionEvent.x && motionEvent.x >= 790f && motionEvent.y >= 200f && motionEvent.y <= 230f){
+                                Toast.makeText(context,"臺中市清水區南社社區發展協會",Toast.LENGTH_SHORT).show()
+                            }
+                            if ( 1630f >= motionEvent.x && motionEvent.x >= 1600f && motionEvent.y >= 900f && motionEvent.y <= 930f){
+                                Toast.makeText(context,"清水南社社區",Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                    true}
         ) {
             drawRect(
                 Color.Blue,
                 Offset(790f,200f),
-                Size(30f,30f)
+                Size(30f,30f),
             )
             drawRect(
                 Color.Blue,
@@ -66,6 +101,7 @@ fun Greeting(name: String) {
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
